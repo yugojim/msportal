@@ -6,6 +6,7 @@ from django.conf import settings
 from django.views.static import serve 
 app_name = 'sdlc'
 urlpatterns = [
+    settings.AUTH.urlpattern,
     path('', views.index, name='index'),
     
     path('Patient/', views.Patient, name='Patient'),
@@ -41,7 +42,6 @@ urlpatterns = [
     path('Interpretation/', views.Interpretation, name='Interpretation'),
     path('ClinvarVariant/', views.ClinvarVariant, name='ClinvarVariant'),
     path('ObservationImaging/', views.ObservationImaging, name='ObservationImaging'),
-    path('linebot', views.linebot, name='linebot'),
     
     path('working', views.working, name='working'),
     path('DischargeSummary', views.DischargeSummary, name='DischargeSummary'),
@@ -53,7 +53,8 @@ urlpatterns = [
     
     path('PatientUpload/', views.PatientUpload, name='PatientUpload'),
     path('DataUpload/', views.DataUpload, name='DataUpload'),
-        
+    
+    #path("call_api", views.call_api),    
     path('admin/',admin.site.urls),
     path('accounts/', include('django.contrib.auth.urls')),
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 

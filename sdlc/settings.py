@@ -12,16 +12,38 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 import os
 from pathlib import Path
 
+
+import random, string
+import secrets
+from dotenv import load_dotenv
+from identity.django import Auth
+load_dotenv()
+
+AUTH = Auth(
+    os.getenv('CLIENT_ID'),
+    client_credential=os.getenv('CLIENT_SECRET'),
+    redirect_uri=os.getenv('REDIRECT_URI'),
+    authority=os.getenv('AUTHORITY'),
+    oidc_authority=os.getenv('OIDC_AUTHORITY'),
+    b2c_tenant_name=os.getenv('B2C_TENANT_NAME'),
+    b2c_signup_signin_user_flow=os.getenv('SIGNUPSIGNIN_USER_FLOW'),
+    b2c_edit_profile_user_flow=os.getenv('EDITPROFILE_USER_FLOW'),
+    b2c_reset_password_user_flow=os.getenv('RESETPASSWORD_USER_FLOW'),
+    )
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-clb)hlznj3dr@tpin1%@9fb*n*$ak%^^5tl7zgo!a(32ps*5ii'
+#SECRET_KEY = os.getenv("SECRET_KEY", default="".join(random.choices(string.printable, k=64)))
+#SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+# SECURITY WARNING: keep the secret key used in production secret!
+SECRET_KEY = os.getenv("SECRET_KEY", default="".join(secrets.choice(string.printable) for _ in range(64)))
 SECURE_PROXY_SSL_HEADER = ("HTTP_X_FORWARDED_PROTO", "https")
+
 # SECURITY WARNING: don't run with debug turned on in production!
 #DEBUG = True
 DEBUG = False
@@ -44,6 +66,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'identity'  # To utilize the default templates came with the identity package
 ]
 
 MIDDLEWARE = [

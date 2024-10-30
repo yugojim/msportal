@@ -28,6 +28,7 @@
                 </a>
                 <div id="collapseTwo" class="collapse" aria-labelledby="headingTwo" data-parent="#accordionSidebar">
                     <div class="bg-white py-2 collapse-inner rounded">
+						<a class="collapse-item" href="{% url 'DischargeSummary' %}">出院病摘單</a>
 						<a class="collapse-item" href="{% url 'VisitNote' %}">門診病歷</a>
 						<a class="collapse-item" href="{% url 'Consent' %}">知情同意</a>
 						<a class="collapse-item" href="{% url 'logging' %}">門診病歷查詢紀錄</a>
@@ -35,6 +36,7 @@
                 </div>
             </li>
 			{% endif %}
+			<!--{% if user.is_authenticated %}-->
 			{% if right.0.patient %}
 			<li class="nav-item">
                 <a class="nav-link collapsed" href="#" data-toggle="collapse" data-target="#collapseOne"
@@ -147,7 +149,8 @@
             </li>
 			<!-- Nav Item - Pages Collapse Menu -->
 			{% endif %}
-			{% else %}
+			{% endif %}
+			<!--{% else %}
 				<a class="dropdown-item" href="{% url 'login' %}">
 					<i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
 					Login
