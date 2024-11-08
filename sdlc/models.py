@@ -22,8 +22,8 @@ class Permission(models.Model):
     def __str__(self):
         #return self.user 
         return f'{self.id} {self.user} {self.title}\
-            病人資料{self.patient} 急診{self.emergency} 門診{self.outpatient} 住診{self.inpatient}\
-                用藥{self.medication} 報告{self.report} 行政{self.administrative} 上傳{self.up}\
+            病人資料 {self.patient} 急診 {self.emergency} 門診 {self.outpatient} 住診 {self.inpatient}\
+                用藥 {self.medication} 報告 {self.report} 行政 {self.administrative} 上傳{self.up}\
                     修改時間{self.dateTimeOfUpload}'
 
 class fhirip(models.Model):

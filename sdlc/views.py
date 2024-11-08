@@ -28,7 +28,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 fhir = 'http://192.168.211.9:8080/fhir/'#4600VM
 postgresip = "192.168.211.19"
 #postgresip = "203.145.222.60"
-
+'''
 @csrf_exempt 
 def index(request): 
     user = request.user
@@ -50,24 +50,25 @@ __version__ = "0.5.0"
 @csrf_exempt
 @settings.AUTH.login_required
 def index(request, *, context):
-    
-    #print(context['user']['preferred_username'])
-    try:
+    if not request.user.is_authenticated:
+        user = User.objects.filter(username=context['user']['preferred_username'])
+    else:
+        user = request.user
+    #print(user)
+    #print(context['user']['preferred_username'])    
+    try:       
         user = User.objects.create_user(username=context['user']['preferred_username'],password= os.getenv("USR_PASSWORD"))
         #print(user)
     except :
         print('logined')
     right=models.Permission.objects.filter(user__username__startswith=context['user']['preferred_username'])
-    answers_list = list(right)
-    #user=context['user']
-    #print(user.username)
-    #User.objects.create(username='user without password')
     return render(request, 'index.html', dict(
-        user=context['user'],
+        #user=context['user'],
+        user=user,
         edit_profile_url=settings.AUTH.get_edit_profile_url(),
         api_endpoint=os.getenv("ENDPOINT"),
         title=f"Microsoft Entra ID Django Web App Sample v{__version__}",
-        right=answers_list
+        right=right
     ))  
     
 @settings.AUTH.login_required(scopes=os.getenv("SCOPE", "").split())
@@ -81,7 +82,7 @@ def call_api(request, *, context):
         "title": "Result of API call",
         "content": json.dumps(api_result, indent=4),
     })
-'''
+#'''
 def ambulance(request):
     user = request.user
     right=models.Permission.objects.filter(user__username__startswith=user.username)
