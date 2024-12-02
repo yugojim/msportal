@@ -6,7 +6,7 @@ import datetime
 import requests.packages.urllib3
 requests.packages.urllib3.disable_warnings()
 
-fhir = 'http://192.168.211.9:8080/fhir/'#4600VM
+fhir = 'http://40.81.30.76:8080/fhir/'#4600VM
 
 headers = {    
     'Content-Type': 'application/json',
@@ -1345,76 +1345,62 @@ def ConditionStageCRUD(request):
         return ('method NG')
     
 def ImagingStudyCRUD(request):
-    jsonPath=str(pathlib.Path().absolute()) + "/static/template/ImagingStudy.json"
+    #jsonPath=str(pathlib.Path().absolute()) + "/static/template/Composition_DischargeSummary135726.json"
     #print(jsonPath)
-    Conditionjson = json.load(open(jsonPath,encoding="utf-8"))
-    #print(Conditionjson)
-    payload={}
-    headers = {
-      'Content-Type': 'application/json',
-      'Accept': 'application/json'
-    }
-    Conditionurl = fhir+'ImagingStudy?'
-    #print(Conditionurl)
+    #DiagnosticReportNursingjson = json.load(open(jsonPath,encoding="utf-8"))
+    #print(DiagnosticReportNursingjson)
+    
+    fhirip=request.POST['fhirip']
+    if fhirip!='':        
+        DiagnosticReportNursingjsonurl = fhirip +'Bundle?'
+    else:
+        DiagnosticReportNursingjsonurl = fhir +'Bundle?'
+    #print(DiagnosticReportNursingjsonurl)
     method=request.POST['method']
+    #response = requests.request(method, DiagnosticReportNursingjsonurl, headers=headers, data=payload, verify=False)    
+    #print(response.text)
     resourceTypeid=request.POST['id']
-    Conditionjson['id']=resourceTypeid
-    patient=request.POST['patient']
-    Conditionjson['subject']['reference']='Patient/'+patient
-    '''
-    asserter=request.POST['asserter']
-    Conditionjson['asserter']['reference']='Practitioner/'+asserter
-
-    snomed=request.POST['snomed']
-    Conditionjson['code']['coding'][0]['code']=snomed
-    display=request.POST['display']
-    Conditionjson['code']['coding'][0]['display']=display
-    
-    category=request.POST['category']
-    Conditionjson['category'][0]['coding'][0]['code']=category
-    tumor=request.POST['tumor']
-    Conditionjson['stage'][0]['summary']['coding'][0]['code']=tumor
-    nodes=request.POST['nodes']
-    Conditionjson['stage'][1]['summary']['coding'][0]['code']=nodes
-    metastasis=request.POST['metastasis']
-    Conditionjson['stage'][2]['summary']['coding'][0]['code']=metastasis
-    
-    onsetDateTime=request.POST['onsetDateTime']
-    if onsetDateTime!='':
-        onsetDateTime=onsetDateTime+':00'
-    Conditionjson['onsetDateTime']=onsetDateTime
-    '''        
-    #print(Conditionjson)
-    payload = json.dumps(Conditionjson)
-    
+    #if resourceTypeid!='':        
+    #    DiagnosticReportNursingjson['id']=resourceTypeid
+    #resourceIdentifier=request.POST['identifier']
+    #if resourceIdentifier!='':
+    #    DiagnosticReportNursingjson['identifier'][0]['value']=resourceIdentifier    
+    #print(method,DiagnosticReportNursingjsonurl,headers)
     if method=='GET':
-        if patient!='':
-            Conditionurl=Conditionurl+'patient='+patient+'&'
-        #if encounter!='':
-        #    DiagnosticReportNursingjsonurl=DiagnosticReportNursingjsonurl+'encounter='+encounter+'&'
-        response = requests.request(method, Conditionurl, headers=headers, data=payload, verify=False)
+        if resourceTypeid!='':
+            DiagnosticReportNursingjsonurl=DiagnosticReportNursingjsonurl+'_id='+resourceTypeid+'&'
+        Patientname=request.POST['name']
+        if Patientname!='':        
+            DiagnosticReportNursingjsonurl=DiagnosticReportNursingjsonurl+'subject:Patient.name='+Patientname+'&'
+        DiagnosticReportNursingjsonurl=DiagnosticReportNursingjsonurl
+        response = requests.request(method, DiagnosticReportNursingjsonurl, headers=headers, data=payload, verify=False)
         resultjson=json.loads(response.text)
         #print(resultjson)
-        return ('GET OK',resultjson)
+        return ('查詢完畢',resultjson)
     elif method=='POST':
-        response = requests.request(method, Conditionurl, headers=headers, data=payload, verify=False)
-        #resstr='{"entry":[{"resource":'+response.text+'}]}'
-        #print(response.text)
+        response = requests.request(method, DiagnosticReportNursingjsonurl, headers=headers, data=payload, verify=False)
+        #print(method,DiagnosticReportNursingjsonurl,headers,payload)
         resultjson=json.loads('{"entry":[{"resource":'+response.text+'}]}')
-        #print(resultjson)        
-        return ('POST OK',resultjson)
+        #print(response.status_code)
+        return ('新增完畢',resultjson)
     elif method=='PUT':
-        PUTurl = fhir+"ImagingStudy/"+str(resourceTypeid)
+        if fhirip!='':        
+            PUTurl = fhirip + "Composition/" + str(resourceTypeid)
+        else:
+            PUTurl = fhir + "Composition/" + str(resourceTypeid)
         response = requests.request(method, PUTurl, headers=headers, data=payload, verify=False)
+        #print(method,DiagnosticReportNursingjsonurl,headers,payload)
         resultjson=json.loads('{"entry":[{"resource":'+response.text+'}]}')
-        return ('PUT OK',resultjson)
+        return ('修改完畢',resultjson)
     elif method=='DELETE':
-        DELETEurl = fhir+"ImagingStudy/"+str(resourceTypeid)
+        if fhirip!='':        
+            DELETEurl = fhirip + "Composition/" + str(resourceTypeid)
+        else:
+            DELETEurl = fhir + "Composition/" + str(resourceTypeid)
         response = requests.request(method, DELETEurl, headers=headers, data=payload, verify=False)
+        #print(method,DiagnosticReportNursingjsonurl,headers,payload)
         resultjson=json.loads(response.text)        
-        return ('DELETE OK',resultjson['issue'][0])
-    else:
-        return ('method NG')
+        return ('刪除完畢',resultjson['issue'][0])
     
 def EndpointCRUD(request):
     jsonPath=str(pathlib.Path().absolute()) + "/static/template/Endpoint.json"

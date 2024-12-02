@@ -568,11 +568,17 @@ def ConditionStage(request):
 
 def ImagingStudy(request):
     user = request.user
-    #print(user.username)
     right=models.Permission.objects.filter(user__username__startswith=user.username)
+    fhirip=models.fhirip.objects.all()
+    try:
+        fhiripSelect=request.POST['fhirip']
+    except:
+        fhiripSelect=''
     try:
         Result,data = Function.ImagingStudyCRUD(request)
         context = {
+                'fhiripSelect' : fhiripSelect,
+                'fhirip' : fhirip,
                 'right' : right,
                 'FuncResult' : Result,
                 'data' : data
@@ -580,10 +586,13 @@ def ImagingStudy(request):
         return render(request, 'ImagingStudy.html', context)
     except:
         context = {
-                'right' : right,
-                'FuncResult' : 'Function'
-                } 
+                'fhiripSelect' : fhiripSelect,
+                'fhirip' : fhirip,
+                'right' : right,                
+                'FuncResult' : '查無資料'
+            } 
         return render(request, 'ImagingStudy.html', context)
+
 
 def Endpoint(request):
     user = request.user

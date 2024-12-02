@@ -1,7 +1,6 @@
 {% load static %}
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -25,84 +24,106 @@
                 <!-- Begin Page Content -->
                 <div class="container-fluid">
 					<div class="d-sm-flex align-items-center justify-content-between mb-4">
-						<h3>影像報告 <span class="badge badge-secondary">ImagingStudy {{ FuncResult }}</span></h3>
-						<a href="https://www.hl7.org/fhir/imagingstudy.html" target="_blank" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
-								class="fas fa-download fa-sm text-white-50"></i>ImagingStudy Release 4B</a>
+						<h3>醫療影像及報告 <span class="badge badge-secondary">ImagingStudy {{ FuncResult }}</span></h3>
+						<a href="https://emr.mohw.gov.tw/myemr/fhir.html" target="_blank" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i
+								class="fas fa-download fa-sm text-white-50"></i>衛福部電子病歷推動專區</a>
 					</div>
 					
 					<form method="post" action="{% url 'ImagingStudy' %}">
 					{% csrf_token %}
 					<div class="form-group">
 						<div class="form-row">
-							<div class="form-group col-md-1">
-							  <select name="method" class="form-control">
-								<option value="GET" selected>查詢</option>
-								<option value="POST" >新增</option>
-								<option value="PUT" >修改</option>
-								<option value="DELETE" >刪除</option>
+							<div class="form-group col-md-2">
+							  <select name="fhirip" class="form-control">
+								{% for fhir in fhirip %}
+								<option value="{{fhir.ip}}"
+									{% if fhir.ip == fhiripSelect %}
+										selected
+									{% endif %} 
+									>{{ fhir.location }}</option>
+								{% endfor %}
 							  </select>
 							</div>
 							<div class="form-group col-md-1">
-								<label>ID</label>
+							  <select name="method" class="form-control">
+								<option value="GET" selected>查詢</option>
+							  </select>
+							</div>
+							<div class="form-group col-md-1">
+								<label><h4>ID</h4></label>
 							</div>
 							<div class="form-group col-md-1">
 								<input type="text" class="form-control" id="id" name="id">
 							</div>
 							<div class="form-group col-md-1">
-								<label>Patient ID (S)</label>
+								<label><h4>病人姓名</h4></label>
 							</div>
 							<div class="form-group col-md-1">
-								<input type="text" class="form-control" id="patient" name="patient">
-							</div>
-							<div class="form-group col-md-1">
-								<label >Encounter</label>
-							</div>
-							<div class="form-group col-md-1">
-								<input type="text" class="form-control" id="Endpoint" name="Endpoint">
+								<input type="text" class="form-control" id="name" name="name">
 							</div>
 							<div class="form-group col-md-1">
 								<button type="submit" class="btn btn-primary">Submit</button>
-							</div>							
-						</div>  
+							</div>
+						</div>					  
 					</div>
 					</form>
 					{{data.diagnostics}}
 					<div class="card shadow mb-4">
                         <div class="card-header py-3">
-                            <h6 class="m-0 font-weight-bold text-primary">Procedure</h6>
+                            <h6 class="m-0 font-weight-bold text-primary">ImagingStudy</h6>
                         </div>
                         <div class="card-body">
                             <div class="table-responsive">
                                 <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                     <thead>
                                         <tr>
-											<th>ID</th>
-                                            <th>Patient</th>
-											<th>uid</th>
-											<th>Endpoint</th>
-											<th>series</th>
-											<th>instance</th>
+											<th>單張編號</th>
+                                            <th>fullUrl</th>
+                                            <th>Instances WADO URL</th>
+                                            <th>Viewer</th>
+											<th>日期時間</th>
                                         </tr>
                                     </thead>
                                     <tfoot>
                                         <tr>
-											<th>ID</th>
-                                            <th>Patient</th>
-											<th>uid</th>
-											<th>Endpoint</th>
-											<th>series</th>
-											<th>instance</th>
+											<th>單張編號</th>
+                                            <th>fullUrl</th>
+                                            <th>Instances WADO URL</th>
+                                            <th>Viewer</th>
+											<th>日期時間</th>
                                         </tr>
                                     </tfoot>
                                     <tbody>
 										{% for entry in data.entry %}
 										<tr>
-											<td>{{ entry.resource.id }}</td>
-											<td>{{ entry.resource.subject.reference }}</td>
-											<td>{{ entry.resource.identifier }}</td>
-											<td><a href= "http://137.116.141.127:8080/fhir/{{ entry.resource.endpoint.0.reference }}" target="_blank">{{ entry.resource.endpoint.0.reference }}</a></td>
-											<td>{{ entry.resource.series.0.uid }}</td>
-											<td><a href="http://137.116.141.127:8042/wado/?requestType=WADO&studyUID=1.3.46.670589.11.71916.5.0.14872.2019042920560682013&seriesUID=1.3.46.670589.11.71916.5.0.5656.2019042922075063106&objectUID=1.3.46.670589.11.71916.5.0.5656.2019042922091798212&application%2Fdicom" target="_blank">{{ entry.resource.series.0.instance.0.uid }}</a></td>
+											<td><a href="http://40.81.30.76:8080/fhir/Bundle/{{ entry.resource.id }}" target="_blank">{{ entry.resource.id }}</a></td>
+											<td>
+											{% for entry in entry.resource.entry %}
+												{{ entry.fullUrl}}<br>												
+											{% endfor %}
+											</td>	
+											<td><a href="http://40.81.30.76:8042/wado/?requestType=WADO&studyUID=1.2.840.113820.7212400029.317.874224010109973.8.1&seriesUID=1.3.46.670589.33.1.63840583647412272000002.4622047575935151311.1&objectUID=1.3.46.670589.33.1.63840583686271494600001.5759875654580876136.1&contentType=image%2Fjpg" target="_blank">1.3.46.670589.33.1.63840583686271494600001.5759875654580876136.1</a>
+											</td>
+											<td>
+											<a href="http://40.81.30.76:8042/ohif/viewer?StudyInstanceUIDs=1.2.840.113820.7212400029.317.874224010109973.8.1" target="_blank" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i>OHIF</a><br>
+											
+											<a href="http://40.81.30.76:8042/stone-webviewer/index.html?study=1.2.840.113820.7212400029.317.874224010109973.8.1" target="_blank" class="d-none d-sm-inline-block btn btn-sm btn-primary shadow-sm"><i class="fas fa-download fa-sm text-white-50"></i>Stone-Web</a><br>
+
+											</td>
+											<td>{{ entry.resource.started }}</td>	
+											<!--
+											<td>
+												{% for section in entry.resource.section %}
+													{{ section.title }}<br>
+														
+													{{ section.code.coding.0.display }}<br>	
+													{{ section.text.div }}<br>
+													{% for entry in section.entry %}
+														{{ entry.display }}<br>
+													{% endfor %}	
+													<br>												
+												{% endfor %}												
+											</td>-->	
 										</tr>
 										{% endfor %}										 
                                     </tbody>
@@ -129,7 +150,8 @@
         <!-- End of Content Wrapper -->
     </div>
     <!-- End of Page Wrapper -->
-{% include 'utilities-js.html' %}
+{% include 'utilities-js.html' %}    
 </body>
+
 
 </html>
